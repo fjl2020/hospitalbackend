@@ -4,14 +4,28 @@ const bcript=require('bcryptjs')
 const {generarJWT}=require('../helpers/jwt')
 
 const getUsuarios = async(req, res) => {
-    const usuarios=await Usuario.find({},'nombre email role google');
+    const desde=parseInt(req.query.desde || 0)
+    const limit=parseInt(req.query.limit || 5)
+
+    // const tinit=(new Date()).getTime()
+
+    // console.log(desde,limit);
+    // const usuarios=await Usuario
+        // .find({},'nombre email role google').skip(desde).limit(limit);
+    // const totalReg=await Usuario.count();
+    const [usuarios,totalReg]= await Promise.all([ Usuario
+        .find({},'nombre email role google img').skip(desde).limit(limit), 
+        Usuario.countDocuments()]);
+    
+    // console.log('time : ',((new Date()).getTime()-tinit));
+
     const uid=req.uid
     if(!uid)
     {
         res.status(401).json({msg:'Token no valido'})
     }
     res.json({
-        usuarios,uid
+        usuarios,uid,total_reg:totalReg
     }
     )
 };

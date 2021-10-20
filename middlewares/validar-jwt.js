@@ -17,7 +17,7 @@ const validarJWT=(req,res,next)=>{
     } catch (error) {
         return res.status(401).json({msg:'token incorrecto'})
     }
-    console.log(token);
+    // console.log(token);
     next()
 
 }
