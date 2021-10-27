@@ -49,15 +49,56 @@ const crearMedico = async (req, res) => {
 
 }
 const updateMedico=async (req,res)=>{
-    res.json({
-        msg:'medicos update'
-    })
+    const id=req.params.id;
+    const nombre=req.body.nombre;
+    const usuarioId=req.uid
+    const medicoDB=await Medico.findById(id);
+    if (!medicoDB)
+    {
+        return res.status(401).json({
+            msg:'El medico no existe'
+        });
+    }
+    const cambiosMedicos={
+        ...req.body,usuario:usuarioId
+    }
+
+    try {
+        const medicoAcualizado=await Medico.findByIdAndUpdate(id,cambiosMedicos,{new:true});
+        res.json({
+            msg:'Medicos actualizados',
+            medico:medicoAcualizado
+        })
+        
+    } catch (error) {
+        res.status(500).json({
+            msg:'Error en médicos update'
+        })
+        
+    }
     
 }
 const deleteMedico=async(req,res)=>{
-    res.json({
-        msg:'medicos delete'
-    })
+
+    const id =req.params.id;
+    const medicoDB=await Medico.findById(id);
+    if (!medicoDB)
+    {
+        return res.status(401).json({
+            msg:'El medico no existe'
+        });
+    }
+    try {
+        const medicosDel=await Medico.findByIdAndDelete(id);
+        res.json({
+            msg:'Se borro el medico...'
+        })    
+    } catch (error) {
+        res.status(500).json({
+            msg:'Error al borrar'
+        })
+    }
+    
 }
 
 module.exports = { getMedicos, crearMedico , updateMedico, deleteMedico}

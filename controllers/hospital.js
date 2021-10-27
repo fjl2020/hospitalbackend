@@ -73,56 +73,62 @@ const crearHospital = async (req, res) => {
 
 }
 const updateHospital=async (req,res)=>{
-    res.json({
-        msg:'hospital update'
+    const id=req.params.id
+    const {nombre}=req.body
+    // console.log(id);/
+    const hospitalDB=await Hospital.findById(id)
+    if (!hospitalDB){
+        return res.status(401).json({
+            msg:'El hospital no existe'
+        })    
+
+    }
+   try {
+       const cambiosHospital={
+           ...req.body,usuario:req.uid
+       }
+
+       const cambiosActualizados=await Hospital.findByIdAndUpdate(id,cambiosHospital,{new:true})
+    //    hospitalDB.nombre=nombre;
+    //    hospitalDB.save();
+       res.json({
+           msg:'hospital update',
+           hospital:cambiosActualizados
+       });
+       
+   } catch (error) {
+       console.log(error);
+    res.status(500).json({
+        msg:'Error al actualizar...'
     })
-    // const uid=req.params.id
-    // // const {rol,email,nombre}=req.body
-    // const {password,google,email,...campos}=req.body
-    // try {
-    //     const usuarioDB=await Usuario.findById(uid)
-    //     if (!usuarioDB)
-    //     {
-    //         return res.status(404).json({msg:'No existe usuario con ese id'})
-    //     }
-    //     //Actualizar usuario
-    //     if (usuarioDB.email!=email){
-    //         const existeEmail=await Usuario.findOne({email})
-    //         if (existeEmail)
-    //         {
-    //             return res.status(400).json({'msg':'El email ya existe'})
-    //         }
-    //     }
-    //     // delete campos.password
-    //     // delete campos.google
-        
-    //     campos.email=email
-    //     const usuarioActualizado=await Usuario.findByIdAndUpdate(uid,campos,{new:true})
-    //     console.log(usuarioActualizado);
-
-    //     res.json({'msg':'update user: '+uid,'user updated':usuarioActualizado})    
-    // } catch (error) {
-
-    //     res.status(500).json({msg:'Error inesperado en Update usuario'})
-    // }
+   }
+   
     
 }
 const deleteHospital=async(req,res)=>{
-    res.json({
-        msg:'hospital delete'
-    })
+    const id=req.params.id;
+    const hospitalDB=await Hospital.findById(id)
+    if (!hospitalDB){
+        return res.status(401).json({
+            msg:'El hospital no existe'
+        })    
 
-    // try {
-    //     const userToDelete=await Usuario.findByIdAndDelete(req.params.id)    
-    //     if (!userToDelete){
-    //         return res.status(500).json({msg:'usuario no existe'})
-    //     }
-    //     res.json({msg:'usuario borrado exitosamente'})
-    // } catch (error) {
-    //    return res.status(500).json({msg:'Error inesperado en Update usuario'})
-    // }
+    }
+    try {
+
+        const hospitalDel=await Hospital.findByIdAndDelete(id)
+        
+        res.json({
+            msg:'hospital delete',
+        })    
+    } catch (error) {
+        res.status(500).json({
+            msg:'Error hospital delete',
+        })
+    }
     
-    // res.status(200).json({msg:'delte'})
+
+    
 }
 
 module.exports = { getHospital, crearHospital ,updateHospital,deleteHospital}
